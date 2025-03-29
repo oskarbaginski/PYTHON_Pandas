@@ -1,0 +1,125 @@
+#zgodnie z ustaleniami na zajęciach wszytskie zadania sa w jedym pliku
+
+# zad 1.  
+
+import pandas as pd
+
+plik_csv = "Dane Future Collars/dataset_pandas_pd.csv"
+
+df = pd.read_csv(plik_csv, header=None) 
+
+# Ustawianie nazw kolumn
+df.columns = ['imię', 'nazwisko', 'rok urodzenia', 'miesiac urodzenia', 'dzień urodzenia',
+    'miejsce urodzenia', 'miasto, w którym znajduje się oddział firmy',
+    'departament', 'rok rozpoczęcia pracy w firmie', 'miesiac rozpoczęcia pracy',
+    'dzień rozpoczęcia pracy', 'doswiadczenie (w latach)']
+
+df.head()
+
+# zad 2.
+
+najczestsze_nazwisko = df['nazwisko'].value_counts().idxmax()
+liczba_wystapien = df['nazwisko'].value_counts().max()
+
+print(f"Najczęstsze nazwisko to: {najczestsze_nazwisko}, które występuje {liczba_wystapien} razy.")
+
+# zad3. 
+
+df['płeć'] = df['imię'].apply(lambda x: 'kobieta' if x.endswith('a') else 'mężczyzna')
+
+kolumny = df.columns.tolist()  
+indeks = kolumny.index('nazwisko')  
+kolumny.insert(indeks + 1, kolumny.pop(kolumny.index('płeć')))  
+
+df = df[kolumny]
+
+df.head()
+
+# zad 4.
+
+df_sorted = df.sort_values(by = ['nazwisko', 'rok urodzenia'])
+
+df_sorted.head()
+
+# zad 5.
+
+df['poziom_doświadczenia'] = df['doswiadczenie (w latach)'].apply( 
+	
+	lambda x: 'Junior' if x <= 3 else 
+              'Mid' if 4 <= x <= 8 else 
+              'Senior' if 9 <= x <= 12 else 
+              'Ekspert')
+
+df.head()
+
+# zad 6.
+
+średni_rok = df.groupby('poziom_doświadczenia')['rok rozpoczęcia pracy w firmie'].transform('mean')
+
+df['rok rozpoczęcia pracy w firmie']=df['rok rozpoczęcia pracy w firmie'].fillna(średni_rok)
+
+df.head()
+
+# zad 7.
+
+data_scientist = df[df['departament']=='Data Science']
+
+najwięcej_ds = data_scientist['miasto, w którym znajduje się oddział firmy'].value_counts()
+
+oddział_max = najwięcej_ds.idxmax()
+liczba_max = najwięcej_ds.max()
+
+print(f"Najwięcej Data Scientistów jest w :{oddział_max} i jest ich {liczba_max}")
+
+# zad 8.
+
+df['departament'] = df['departament'].replace({'Software Development': 'Software Development','HR': 'Human Resources', 'Data Science': 'Data Analytics'})
+
+df.head()
+
+# zad 9. 
+
+seniorzy = df[df['poziom_doświadczenia']=='Senior']
+
+najwięcej_senior = seniorzy['miasto, w którym znajduje się oddział firmy'].value_counts()
+
+oddział_max = najwięcej_senior.idxmax()
+liczba_max = najwięcej_senior.max()
+
+print(f"Najwięcej Seniorów jest w :{oddział_max} i jest ich {liczba_max}")
+
+# zad 10 (brak wyników w tabeli)
+
+# kobiety_juniorki = df[(df['płeć'] == 'kobieta') & (df['poziom_doświadczenia'] == 'Junior')]
+
+# najwięcej_kobiet_juniorek = kobiety_juniorki['miasto, w którym znajduje się oddział firmy'].value_counts()
+
+# oddział_max = najwięcej_kobiet_juniorek.idxmax()
+# liczba_max = najwięcej_kobiet_juniorek.max()
+
+# print(f"Najwięcej Kobiet juniorów jest w :{oddział_max} i jest ich {liczba_max}")
+
+# zad 11. 
+
+kobiety_mid_1975_Krk = df[
+		(df['płeć'] == 'kobieta') & 
+		(df['poziom_doświadczenia'] == 'Mid') & 
+		(df['rok urodzenia'] < 1975) & 
+		(df['miasto, w którym znajduje się oddział firmy'] == 'Kraków')
+]
+
+ilość = kobiety_mid_1975_Krk.shape[0]
+
+print(ilość)
+
+# zad 12.
+
+seniorzy_10yrs = df[
+		(df['poziom_doświadczenia']=='Senior') & 
+		(df['rok rozpoczęcia pracy w firmie'] >= 2015)
+]
+
+ilość = seniorzy_10yrs.shape[0]
+
+print(ilość)
+
